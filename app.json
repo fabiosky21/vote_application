@@ -4,8 +4,8 @@
     "slug": "project1",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "icon": "./assets/images/fulllogot.png",
+    "scheme": "myvotacion",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -13,7 +13,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/fulllogot.png",
         "backgroundColor": "#ffffff"
       }
     },
@@ -28,12 +28,26 @@
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "resizeMode": "cover",
+          "backgroundColor": "#ffffff",
+          "enableFullscreenImage_legacy": true
         }
-      ]
+      ],
+      "expo-video",
+      "expo-secure-store"
     ],
+    "expo-font": {
+      "fonts": [
+        "./assets/fonts/Rubik-Regular.ttf",
+        "./assets/fonts/Rubik-Bold.ttf",
+        "./assets/fonts/Rubik-Medium.ttf",
+        "./assets/fonts/Rubik-Light.ttf",
+        "./assets/fonts/Rubik-Italic.ttf",
+        "./assets/fonts/Rubik-BoldItalic.ttf",
+        "./assets/fonts/Rubik-MediumItalic.ttf",
+        "./assets/fonts/Rubik-LightItalic.ttf"
+      ]
+    },
     "experiments": {
       "typedRoutes": true
     }
