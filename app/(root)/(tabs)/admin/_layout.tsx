@@ -76,6 +76,15 @@ export default function AdminLayout() {
           ),
         }}
       />
+       <Tabs.Screen
+        name="enquiries"  
+        options={{
+          title: "enquiry Admin",
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon focused={focused} icon={icons.problemsolving} title="Enquiries" />
+          ),
+        }}
+      />
     </Tabs>
   );
 }

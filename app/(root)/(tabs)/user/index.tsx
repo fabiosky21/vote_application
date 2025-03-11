@@ -13,10 +13,12 @@ import video from "@/constants/video";
 import { useGlobalContext } from "@/lib/global-provider";
 import NewsBox from "@/components/newsBox";
 import PollBox from "@/components/PollBox";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView,  } from "react-native-safe-area-context";
 import { databases, config } from "@/lib/appwrite";
-import ex1 from "@/assets/images/ex1.gif";
 
+import { useTranslation } from "react-i18next";
+import { StatusBar } from "expo-status-bar";
+import gif from "@/constants/gif";
 
 type Poll = {
   $id: string;
@@ -34,9 +36,10 @@ const Index = () => {
   const [polls, setPolls] = useState<Poll[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [videoKey, setVideoKey] = useState(0);
+  const { t } = useTranslation();
 
   useEffect(() => {
-    console.log("User object:", user); // Add this line to check the user object
+    console.log("User object:", user);
     fetchPolls();
   }, [user]);
 
@@ -71,7 +74,9 @@ const Index = () => {
     setRefreshing(false);
   };
   return (
+
     <SafeAreaView style={styles.container}>
+      <StatusBar style="auto" />
       <ScrollView
         contentContainerStyle={styles.ScrollViewContent}
         refreshControl={
@@ -87,11 +92,11 @@ const Index = () => {
               style={styles.avatar}
             />
             <View style={styles.welcomeContainer}>
-              <Text style={styles.welcomeText}>Welcome,</Text>
-              <Text style={styles.userName}>{user?.name || "Guest"}!</Text>
+              <Text style={styles.welcomeText}>{t("welcome")},</Text>
+              <Text style={styles.userName}>{user?.name || t("guest")}!</Text>
             </View>
           </View>
-          <Image source={ex1} style={styles.gif} />
+          <Image source={gif.ex1} style={styles.gif} />
 
           <Video
             key={videoKey}
@@ -104,10 +109,10 @@ const Index = () => {
             isLooping
             style={styles.video}
           />
-          <Text style={styles.headernews}>News in Ireland</Text>
-          
+          <Text style={styles.headernews}>{t("newsInIreland")}</Text>
+
           <NewsBox />
-          <Text style={styles.pollssect}>Active Polls</Text>
+          <Text style={styles.pollssect}>{t("activePolls")}</Text>
           {polls.map((poll) => (
             <PollBox
               key={poll.$id}
@@ -132,7 +137,8 @@ export default Index;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#fff",
+    
   },
   ScrollViewContent: {
     paddingBottom: 60,
@@ -151,27 +157,24 @@ const styles = StyleSheet.create({
   },
   headernews: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontStyle: "italic",
     alignItems: "center",
     padding: 5,
-    backgroundColor: "#fff",
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    borderRadius: 50,
+    backgroundColor: "#bec2b8",
+    borderRadius: 20,
     margin: 10,
     alignSelf: "center",
   },
   pollssect: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontStyle: "italic",
     alignItems: "center",
     padding: 5,
-    backgroundColor: "#fff",
+    backgroundColor: "#bec2b8",
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 10,
-    borderRadius: 50,
+    borderRadius: 25,
     margin: 10,
     alignSelf: "center",
   },
@@ -195,16 +198,16 @@ const styles = StyleSheet.create({
     color: "#424242",
   },
   video: {
-    width: "100%",
+    width: "90%",
     height: 200,
     marginBottom: 40,
-    borderRadius: 60,
+    borderRadius: 40,
+    marginLeft: 20,
   },
   gif: {
     width: "100%",
     height: 200,
     marginBottom: 20,
     paddingTop: 10,
-
   },
 });

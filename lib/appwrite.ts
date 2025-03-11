@@ -8,10 +8,12 @@ import {
   Query,
   Permission,
   Role,
+  Functions,
 } from "react-native-appwrite";
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 import "react-native-url-polyfill/auto";
+import { application } from "express";
 
 export const config = {
   Platform: "com.tsx.myvotacion",
@@ -23,6 +25,9 @@ export const config = {
   userCollectionId: "67a61c1b00354887b26b",
   pollscollection: "67a62338002b653e3edd",
   votescollection: "67a622d50007c255f6c9",
+  contactIssues: "67cb958a0010fead9d6b",
+  userIssues: "67cba5bd002f25e85810",
+  Messages: "67ccf332002be725bf20",
 };
 export const client = new Client();
 client
@@ -46,7 +51,6 @@ interface NewUser {
   username?: string;
   avatar: string;
 }
-
 export async function emailPasswordLogin(email: string, password: string) {
   const url = `${config.endpoint}/account/sessions/email`;
 
@@ -90,7 +94,7 @@ export async function createEmailUser({
     }
 
     const avatarUrl = avatar.getInitials(username).toString();
-    console.log("🖼 Avatar generated:", avatarUrl);
+    console.log(" Avatar generated:", avatarUrl);
 
     console.log("📦 Storing user in database...");
     const newUser = await databases.createDocument(
@@ -114,6 +118,32 @@ export async function createEmailUser({
     throw new Error(error instanceof Error ? error.message : String(error));
   }
 }
+// here the otp stuff
+const functions = new Functions(client);
+
+export const sendOtp = async (email: string, otp: string) => {
+  return await functions.createExecution(
+    "67ced60600181be5e6b6",
+    JSON.stringify({ email, otp }),
+    false,
+    "application/json"
+  );
+};
+export const verifyOtp = async (email: string, otp: string) => {
+  try {
+    const response = await functions.createExecution(
+      "67ced60600181be5e6b6", // Replace with your actual function ID
+      JSON.stringify({ email, otp, action: "verify" })
+    );
+
+    const result = JSON.parse(response.responseBody);
+    return result.success; // Ensure your function returns `{ success: true }` on valid OTP
+  } catch (error) {
+    console.error("Error verifying OTP:", error);
+    return false;
+  }
+};
+//
 
 export async function login() {
   try {
@@ -153,6 +183,32 @@ export async function login() {
 
     const session = await account.createSession(userId, secret);
     if (!session) throw new Error("Failed to create session");
+    // Get current user details
+    const user = await account.get();
+
+    // Check if the user document exists in your database
+    try {
+      await databases.getDocument(
+        config.databaseId,
+        config.userCollectionId,
+        user.$id
+      );
+    } catch (error) {
+      // Document not found; create a new one
+      const avatarUrl = avatar.getInitials(user.name || user.email).toString();
+      await databases.createDocument(
+        config.databaseId,
+        config.userCollectionId,
+        user.$id, // Use the same ID as the authenticated account
+        {
+          accountId: user.$id,
+          email: user.email,
+          username: user.name || "Google User",
+          avatar: avatarUrl,
+          labels: [],
+        }
+      );
+    }
 
     return true;
   } catch (error) {
@@ -163,13 +219,43 @@ export async function login() {
 
 export async function logout() {
   try {
-    await account.deleteSession("current");
+    // Check for an active session
+    const currentSession = await account
+      .getSession("current")
+      .catch(() => null);
+    if (!currentSession) {
+      console.log("No active session found; already logged out.");
+      // Optionally clear any cached tokens if needed
+      client.setJWT("");
+      return true;
+    }
+    // Delete the session using its actual ID
+    await account.deleteSession(currentSession.$id);
+    client.setJWT("");
+    console.log("Session deleted.");
     return true;
   } catch (error) {
     console.error("Logout error:", error);
     return false;
   }
 }
+
+export const updateUser = async (userId: string, data: Record<string, any>) => {
+  try {
+    console.log(`Updating user ${userId} in the database with data:`, data);
+
+    //  Update the user's document in the database
+    return await databases.updateDocument(
+      config.databaseId,
+      config.userCollectionId,
+      userId,
+      data
+    );
+  } catch (error) {
+    console.error("Error updating user in Appwrite:", error);
+    throw error;
+  }
+};
 
 export async function getCurrentUser() {
   try {
@@ -187,7 +273,7 @@ export async function getCurrentUser() {
 
     return {
       ...response,
-      avatar: avatar.getInitials(response.name).toString(),
+      avatar: userDocument.avatar || response.prefs?.avatar,
       labels: Array.isArray(userDocument.labels) ? userDocument.labels : [], // Include labels in the user object
     };
   } catch (error) {
@@ -284,14 +370,9 @@ export const checkIfUserVoted = async (userId: string, pollId: string) => {
   const response = await databases.listDocuments(
     config.databaseId,
     config.votescollection,
-    [
-      Query.equal("userId", userId),
-      Query.equal("pollId", pollId),
-    ]
+    [Query.equal("userId", userId), Query.equal("pollId", pollId)]
   );
   return response.documents.length > 0;
-
-
 };
 
 // this part is to retrieve the polls that the user has voted
@@ -347,7 +428,6 @@ export const getUserVotedPolls = async () => {
   }
 };
 
-
 export const checkIfPollExists = async (title: string) => {
   const response = await databases.listDocuments(
     config.databaseId,
@@ -357,22 +437,36 @@ export const checkIfPollExists = async (title: string) => {
   return response.documents.length > 0;
 };
 
-
 // here the logic for the pycharts
 
 export const getPollResults = async () => {
   try {
-    const response = await databases.listDocuments(config.databaseId, config.votescollection);
+    const response = await databases.listDocuments(
+      config.databaseId,
+      config.votescollection
+    );
 
     // Create a map to store the results
-    const pollResultsMap: { [key: string]: { yesVotes: number; noVotes: number; title: string; status: string } } = {};
+    const pollResultsMap: {
+      [key: string]: {
+        yesVotes: number;
+        noVotes: number;
+        title: string;
+        status: string;
+      };
+    } = {};
 
     // Iterate over the votes and count the yes and no votes for each poll
     response.documents.forEach((vote) => {
       const { pollId, selectedOption } = vote;
 
       if (!pollResultsMap[pollId]) {
-        pollResultsMap[pollId] = { yesVotes: 0, noVotes: 0, title: "", status: "active" };
+        pollResultsMap[pollId] = {
+          yesVotes: 0,
+          noVotes: 0,
+          title: "",
+          status: "active",
+        };
       }
 
       if (selectedOption === "Yes") {

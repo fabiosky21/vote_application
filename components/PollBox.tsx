@@ -14,6 +14,8 @@ import { useGlobalContext } from "@/lib/global-provider";
 import { useVotedPolls } from "@/context/VotedPollsContext";
 import { config, databases } from "@/lib/appwrite";
 import { Query } from "appwrite";
+import { useTranslation } from "react-i18next";
+
 
 interface PollBoxProps {
   pollId: string;
@@ -41,6 +43,12 @@ const PollBox: React.FC<PollBoxProps> = ({
   const { user } = useGlobalContext();
   const [userId, setUserId] = useState<string | null>(null);
   const { refreshVotedPolls } = useVotedPolls();
+  const { t, i18n } = useTranslation();
+
+  const [translatedTitle, setTranslatedTitle] = useState(title);
+  const [translatedBriefDesc, setTranslatedBriefDesc] = useState(briefDescription);
+  const [translatedFullDesc, setTranslatedFullDesc] = useState(fullDescription);
+  const [translatedOptions, setTranslatedOptions] = useState<string[]>(options);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -59,12 +67,36 @@ const PollBox: React.FC<PollBoxProps> = ({
     }
   }, [userId]);
 
+  useEffect(() => {
+    const translatePollData = async () => {
+      setTranslatedTitle(await translateText(title, i18n.language));
+      setTranslatedBriefDesc(await translateText(briefDescription, i18n.language));
+      setTranslatedFullDesc(await translateText(fullDescription, i18n.language));
+
+      const translatedOpts = await Promise.all(options.map(opt => translateText(opt, i18n.language)));
+      setTranslatedOptions(translatedOpts);
+    };
+
+    translatePollData();
+  }, [i18n.language]);
+
   const checkVote = async () => {
     if (!userId) return;
     const voted = await checkIfUserVoted(userId, pollId);
     setHasVoted(voted);
   };
-
+ const translateText = async (text: string, targetLang: string) => {
+    if (!text) return text;
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+    try {
+      const response = await fetch(url);
+      const result = await response.json();
+      return result[0]?.[0]?.[0] || text;
+    } catch (error) {
+      console.error("Translation error:", error);
+      return text;
+    }
+  };
   const registerVoteInDatabase = async (
     correctPollId: string,
     option: string
@@ -79,7 +111,7 @@ const PollBox: React.FC<PollBoxProps> = ({
       console.log("Vote registered in database with poll ID:", correctPollId);
       setHasVoted(true); // Prevent further votes
       refreshVotedPolls();
-      Alert.alert("Vote registered successfully!");
+      Alert.alert(t("voteRegisteredSuccess"));
     } catch (err) {
       console.error("Failed to register vote:", err);
     }
@@ -87,7 +119,7 @@ const PollBox: React.FC<PollBoxProps> = ({
 
   const handleVote = async (option: string) => {
     if (hasVoted) {
-      Alert.alert("You cannot vote twice in the same poll.");
+      Alert.alert(t("voteAlreadyCast"));
       return;
     }
 
@@ -109,7 +141,7 @@ const PollBox: React.FC<PollBoxProps> = ({
       await registerVoteInDatabase(correctPollId, option);
       setHasVoted(true);
       refreshVotedPolls();
-      Alert.alert("Vote registered!");
+      Alert.alert(t("voteRegisteredSuccess"));
     } catch (error) {
       console.error("Error in handleVote:", error);
     }
@@ -119,13 +151,13 @@ const PollBox: React.FC<PollBoxProps> = ({
     <View
       style={[styles.container, status !== "active" && styles.decidedContainer]}
     >
-      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.title}>{translatedTitle}</Text>
       <Image source={{ uri: image }} style={styles.image} resizeMode="cover" />
-      <Text style={styles.briefDesc}>{briefDescription}</Text>
+      <Text style={styles.briefDesc}>{translatedBriefDesc}</Text>
 
       {/* Read More Button */}
       <TouchableOpacity onPress={() => setModalVisible(true)}>
-        <Text style={styles.readMore}>Read More</Text>
+        <Text style={styles.readMore}>{t("readMore")}</Text>
       </TouchableOpacity>
 
       {status === "active" ? (
@@ -143,7 +175,7 @@ const PollBox: React.FC<PollBoxProps> = ({
         </View>
       ) : (
         <Text style={styles.decidedText}>
-          The poll has been decided. Please direct to the result page.
+          {t("pollDecidedMessage")}
         </Text>
       )}
 
@@ -163,8 +195,8 @@ const PollBox: React.FC<PollBoxProps> = ({
               resizeMode="cover"
             />
             <Text style={styles.fullDesc}>{fullDescription}</Text>
-            <Text style={styles.infoText}>Poll ID: {pollId}</Text>
-            <Text style={styles.infoText}>Created By: {createdBy}</Text>
+            <Text style={styles.infoText}>{t("pollId")}: {pollId}</Text>
+            <Text style={styles.infoText}>{t("createdBy")}: {createdBy}</Text>
             <View style={styles.statusContainer}>
               <Text style={styles.statusText}>{status}</Text>
             </View>
@@ -182,7 +214,7 @@ const PollBox: React.FC<PollBoxProps> = ({
               ))}
             </View>
 
-            <Button title="Close" onPress={() => setModalVisible(false)} />
+            <Button title={t("close")} onPress={() => setModalVisible(false)} />
           </View>
         </View>
       </Modal>

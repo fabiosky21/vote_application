@@ -17,7 +17,11 @@ import arrowr from "@/assets/icons/arrowr.png";
 import createpolls from "@/assets/icons/createpolls.png";
 import approval from "@/assets/icons/approval.png";
 import adminu from "@/assets/icons/adminu.png";
-
+import back from "@/assets/icons/back.png";
+import edit from "@/assets/icons/edit.png";
+import customer_service from "@/assets/icons/customer_service.png";
+import chat from "@/assets/icons/chat.png";
+import problemsolving from "@/assets/icons/problemsolving.png";
 export default {
   home,
   eye,
@@ -38,5 +42,10 @@ export default {
   createpolls,
   approval,
   adminu,
+  back,
+  edit,
+  customer_service,
+  chat,
+  problemsolving,
 
 };

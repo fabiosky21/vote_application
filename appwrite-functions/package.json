@@ -1,0 +1,20 @@
+{
+  "name": "appwrite-functions",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "appwrite": "^17.0.0",
+    "appwrite-functions": "file:",
+    "dotenv": "^16.4.7",
+    "node-appwrite": "^15.0.0",
+    "nodemailer": "^6.10.0"
+  }
+}

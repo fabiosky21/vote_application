@@ -10,6 +10,7 @@ import {
 import icons from "@/constants/icons";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/appwrite";
+import { useTranslation } from "react-i18next";
 
 const TabBarIcon = ({
   focused,
@@ -35,6 +36,7 @@ const TabBarIcon = ({
 );
 
 export default function UserLayout () {
+  const { t } = useTranslation();
 
 
   return (
@@ -53,23 +55,23 @@ export default function UserLayout () {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: t("nav_home"),
           headerShown: false,
           tabBarIcon: ({ focused }) => (
-            <TabBarIcon focused={focused} icon={icons.home} title="Home" />
+            <TabBarIcon focused={focused} icon={icons.home} title={t("nav_home")} />
           ),
         }}
       />
       <Tabs.Screen
         name="completedPolls"
         options={{
-          title: "completedPolls",
+          title: t("nav_completed_polls"),
           headerShown: false,
           tabBarIcon: ({ focused }) => (
             <TabBarIcon
               focused={focused}
               icon={icons.completed_}
-              title="Completed polls"
+              title={t("nav_completed_polls")}
             />
           ),
         }}
@@ -77,13 +79,13 @@ export default function UserLayout () {
       <Tabs.Screen
         name="resultpage"
         options={{
-          title: "resultpage",
+          title: t("nav_result_page"),
           headerShown: false,
           tabBarIcon: ({ focused }) => (
             <TabBarIcon
               focused={focused}
               icon={icons.evaluation}
-              title="Result Page"
+              title={t("nav_result_page")}
             />
           ),
         }}
@@ -91,13 +93,13 @@ export default function UserLayout () {
       <Tabs.Screen
         name="profile"
         options={{
-          title: "profile",
+          title: t("nav_profile"),
           headerShown: false,
           tabBarIcon: ({ focused }) => (
             <TabBarIcon
               focused={focused}
               icon={icons.profile}
-              title="Setting/Profile"
+              title={t("nav_profile")}
             />
           ),
         }}

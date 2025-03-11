@@ -1,5 +1,5 @@
 import React, { createContext, useContext, ReactNode, useEffect } from "react";
-import { getCurrentUser, logout } from "./appwrite";
+import { getCurrentUser, logout, updateUser } from "./appwrite";
 import { useAppwrite } from "./useAppwrite";
 import { useVotedPolls } from "../context/VotedPollsContext";
 
@@ -9,6 +9,7 @@ interface GlobalContextType {
   loading: boolean;
   refetch: (newParams: Record<string, string | number>) => Promise<void>;
   handleLogout: () => Promise<void>;
+  updateUserAvatar: (newAvatar: string) => Promise<void>;
 }
 
 interface User {
@@ -16,6 +17,7 @@ interface User {
   name: string;
   email: string;
   avatar: string;
+  labels: string[];
 }
 
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
@@ -27,8 +29,8 @@ interface GlobalProviderProps {
 export const GlobalProvider = ({ children }: GlobalProviderProps) => {
   const {
     data: user = null, // Default to null
-    loading = false, 
-    refetch = () => Promise.resolve(), 
+    loading = false,
+    refetch = () => Promise.resolve(),
   } = useAppwrite({
     fn: getCurrentUser,
   });
@@ -48,8 +50,23 @@ export const GlobalProvider = ({ children }: GlobalProviderProps) => {
     setVotedPolls([]); // Clear voted polls on logout
     refetch({}); // Refetch user data to update the context
   };
+  const updateUserAvatar = async (newAvatar: string) => {
+    if (!user) return;
 
-  console.log("User Data:", user); 
+    try {
+      console.log("Updating avatar in Appwrite...");
+
+      await updateUser(user.$id, { avatar: newAvatar });
+
+      console.log("Avatar updated successfully in Appwrite!");
+
+      // Instead of setUser (since we are using refetch), trigger a refetch to update user data
+      refetch({});
+    } catch (error) {
+      console.error("Failed to update avatar in Appwrite:", error);
+    }
+  };
+  console.log("User Data:", user);
 
   return (
     <GlobalContext.Provider
@@ -59,6 +76,7 @@ export const GlobalProvider = ({ children }: GlobalProviderProps) => {
         loading,
         refetch,
         handleLogout,
+        updateUserAvatar,
       }}
     >
       {children}
@@ -73,4 +91,3 @@ export const useGlobalContext = (): GlobalContextType => {
 
   return context;
 };
-export default GlobalProvider;

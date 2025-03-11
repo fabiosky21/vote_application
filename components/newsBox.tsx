@@ -10,8 +10,10 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 
-const API_KEY = "d5880409f0bc4ee0b26f737b428b0141"; // Replace with your News API key
+
+const API_KEY = "d5880409f0bc4ee0b26f737b428b0141"; 
 const NEWS_API_URL = `https://newsapi.org/v2/everything?q=Ireland&category&apiKey=${API_KEY}`;
 
 interface Article {
@@ -26,13 +28,24 @@ const NewsBox = () => {
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollViewRef = useRef<ScrollView>(null);
+  const { t, i18n } = useTranslation(); 
 
+  
   useEffect(() => {
     const fetchNews = async () => {
       try {
         const response = await fetch(NEWS_API_URL);
         const data = await response.json();
-        setArticles(data.articles);
+        const translatedArticles = await Promise.all(
+          data.articles.map(async (article: Article) => {
+            return {
+              ...article,
+              title: await translateText(article.title, i18n.language),
+              description: await translateText(article.description, i18n.language),
+            };
+          })
+        );
+        setArticles(translatedArticles);
       } catch (error) {
         console.error("Error fetching news:", error);
       } finally {
@@ -41,7 +54,20 @@ const NewsBox = () => {
     };
 
     fetchNews();
-  }, []);
+  }, [i18n.language]);
+
+  const translateText = async (text: string, targetLang: string) => {
+    if (!text) return t("newsUnavailable");
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURI(text)}`;
+    try {
+      const response = await fetch(url);
+      const result = await response.json();
+      return result[0]?.[0]?.[0] || text;
+    } catch (error) {
+      console.error("Translation error:", error);
+      return text;
+    }
+  };
 
   const handleScroll = (event: any) => {
     const contentOffsetX = event.nativeEvent.contentOffset.x;
@@ -109,6 +135,7 @@ const NewsBox = () => {
 };
 
 const { width } = Dimensions.get("window");
+export default NewsBox;
 
 const styles = StyleSheet.create({
   container: {
@@ -156,4 +183,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default NewsBox;
+
+

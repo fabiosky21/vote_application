@@ -29,6 +29,8 @@ const FormField: React.FC<FormFieldProps> = ({
   secureTextEntry,
   errorMessage,
   iconSource,
+  onFocus,
+  onBlur,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -50,6 +52,8 @@ const FormField: React.FC<FormFieldProps> = ({
           placeholder={placeholder}
           placeholderTextColor="#888"
           secureTextEntry={secureTextEntry ? !showPassword : false}
+          onFocus={onFocus}
+          onBlur={onBlur}
         />
 
         {/* Toggle Password Visibility */}

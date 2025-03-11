@@ -6,6 +6,8 @@ import {
   Image,
   TouchableOpacity,
   Alert,
+  Platform,
+  KeyboardAvoidingView,
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -16,7 +18,7 @@ import CustomButton from "@/components/customButton";
 import FormField from "@/components/formField";
 import { login as googleLogin, emailPasswordLogin } from "../lib/appwrite";
 import axios from "axios";
-
+import { account, databases, config } from "@/lib/appwrite";
 
 
 
@@ -63,6 +65,7 @@ const signIn = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <Image
           source={require("../assets/images/fulllogot.png")}
@@ -198,6 +201,7 @@ const signIn = () => {
           </Link>
         </View>
       </ScrollView>
+    </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

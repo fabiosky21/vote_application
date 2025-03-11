@@ -18,8 +18,8 @@ interface CustomButtonProps {
 const CustomButton = ({
   title,
   handlePress,
-  containerStyles,
-  textStyles,
+  containerStyles = {}, // Default empty object
+  textStyles = {}, // Default empty object
   isLoading,
 }: CustomButtonProps) => {
   return (
@@ -31,30 +31,26 @@ const CustomButton = ({
           minHeight: 60,
           justifyContent: "center",
           alignItems: "center",
-          borderRadius: 10,
-          flexDirection: "row", // Ensure the text and ActivityIndicator are in a row
+          borderRadius: 25, 
+          paddingHorizontal: 20,
+          
         },
-        containerStyles,
-        isLoading && { opacity: 0.5 },
+        containerStyles, 
+        isLoading && { opacity: 0.5 }, 
       ]}
       disabled={isLoading}
     >
-      <Text
-        style={[
-          { color: "#000", fontFamily: "Rubik-ExtraBold", fontSize: 18 },
-          textStyles,
-        ]}
-      >
-        {title}
-      </Text>
-
-      {isLoading && (
-        <ActivityIndicator
-          animating={isLoading}
-          color="#000"
-          size="small"
-          style={{ marginLeft: 8 }}
-        />
+      {isLoading ? (
+        <ActivityIndicator color="#fff" size="small" />
+      ) : (
+        <Text
+          style={[
+            { color: "#fff", fontSize: 18, fontWeight: "bold" },
+            textStyles, 
+          ]}
+        >
+          {title}
+        </Text>
       )}
     </TouchableOpacity>
   );
