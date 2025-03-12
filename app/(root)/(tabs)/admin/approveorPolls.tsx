@@ -8,11 +8,10 @@ import {
   Dimensions,
   SafeAreaView,
   ScrollView,
-  RefreshControl
+  RefreshControl,
 } from "react-native";
 import { BarChart } from "react-native-chart-kit";
 import { getPollResults, databases, config } from "@/lib/appwrite";
-
 
 const ApproveorPolls = () => {
   interface PollResult {
@@ -29,9 +28,9 @@ const ApproveorPolls = () => {
   const fetchPollResults = async () => {
     try {
       const results: PollResult[] = await getPollResults();
-      const resultsWithStatus = results.map(result => ({
+      const resultsWithStatus = results.map((result) => ({
         ...result,
-        status: result.status || "active" // Default status if not provided
+        status: result.status || "active", // Default status if not provided
       }));
       setPollResults(resultsWithStatus);
     } catch (error) {
@@ -102,53 +101,73 @@ const ApproveorPolls = () => {
     const totalVotes = (poll.yesVotes || 0) + (poll.noVotes || 0);
 
     return (
-      <View key={poll.id} style={styles.chartContainer}>
-        <Text style={styles.title}>{poll.title}</Text>
-        <View style={styles.chartRow}>
-          <View style={styles.voteCounts}>
-            <Text style={styles.voteCountText}>Yes: {poll.yesVotes || 0}</Text>
-            <Text style={styles.voteCountText}>No: {poll.noVotes || 0}</Text>
+      <SafeAreaView style={styles.container}>
+        <ScrollView
+          contentContainerClassName="scrollViewContent"
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          <View>
+            <Text style={styles.header}>Information about the polls</Text>
           </View>
-          <BarChart
-            data={data}
-            width={Dimensions.get("window").width - 100} // Adjust width to fit the vote counts
-            height={220}
-            chartConfig={chartConfig}
-            verticalLabelRotation={0}
-            showBarTops={false}
-            fromZero
-            yAxisLabel=""
-            yAxisSuffix=""
-          />
-        </View>
-        <Text style={styles.totalVotesText}>Total Votes: {totalVotes}</Text>
-        {poll.status === "active" ? (
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.approveButton}
-              onPress={() => handleApprove(poll.id)}
-            >
-              <Text style={styles.buttonText}>Approve</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.rejectButton}
-              onPress={() => handleReject(poll.id)}
-            >
-              <Text style={styles.buttonText}>Reject</Text>
-            </TouchableOpacity>
+
+          <View key={poll.id} style={styles.chartContainer}>
+            <Text style={styles.title}>{poll.title}</Text>
+            <View style={styles.chartRow}>
+              <View style={styles.voteCounts}>
+                <Text style={styles.voteCountText}>
+                  Yes: {poll.yesVotes || 0}
+                </Text>
+                <Text style={styles.voteCountText}>
+                  No: {poll.noVotes || 0}
+                </Text>
+              </View>
+              <BarChart
+                data={data}
+                width={Dimensions.get("window").width - 100} // Adjust width to fit the vote counts
+                height={220}
+                chartConfig={chartConfig}
+                verticalLabelRotation={0}
+                showBarTops={false}
+                fromZero
+                yAxisLabel=""
+                yAxisSuffix=""
+              />
+            </View>
+            <Text style={styles.totalVotesText}>Total Votes: {totalVotes}</Text>
+            {poll.status === "active" ? (
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  style={styles.approveButton}
+                  onPress={() => handleApprove(poll.id)}
+                >
+                  <Text style={styles.buttonText}>Approve</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.rejectButton}
+                  onPress={() => handleReject(poll.id)}
+                >
+                  <Text style={styles.buttonText}>Reject</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <Text style={styles.decisionText}>Decision has been taken.</Text>
+            )}
           </View>
-        ) : (
-          <Text style={styles.decisionText}>Decision has been taken.</Text>
-        )}
-      </View>
+        </ScrollView>
+      </SafeAreaView>
     );
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.scrollViewContent} refreshControl={
+      <ScrollView
+        contentContainerStyle={styles.scrollViewContent}
+        refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }>
+        }
+      >
         <View style={styles.container}>
           {pollResults.map((poll) => renderChart(poll))}
         </View>
@@ -171,7 +190,11 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#fff",
-    
+  },
+  header: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 8,
   },
   scrollViewContent: {
     paddingBottom: 50,

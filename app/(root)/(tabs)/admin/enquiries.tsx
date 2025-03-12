@@ -17,6 +17,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { databases, config } from "@/lib/appwrite";
 import { Query, Models, Permission, Role } from "react-native-appwrite";
 import { useGlobalContext } from "@/lib/global-provider";
+import { useTranslation } from "react-i18next";
 
 const Enquiries = () => {
   const [enquiries, setEnquiries] = useState<Models.Document[]>([]);
@@ -29,6 +30,7 @@ const Enquiries = () => {
   const [messages, setMessages] = useState<Models.Document[]>([]);
   const [messageLoading, setMessageLoading] = useState(false);
   const { user } = useGlobalContext();
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchEnquiries();
@@ -203,7 +205,7 @@ const Enquiries = () => {
       style={{ flex: 1 }}
     >
       <SafeAreaView style={styles.container}>
-        <Text style={styles.header}>Admin - Enquiries</Text>
+        <Text style={styles.header}>{t("Admin_Enquiries")}</Text>
         {loading ? (
           <ActivityIndicator size="large" color="#0061FF" />
         ) : (
@@ -221,13 +223,23 @@ const Enquiries = () => {
               >
                 <Text style={styles.issueType}>User: {item.name}</Text>
 
-                <Text style={styles.issueType}>Issue: {item.issueType}</Text>
+                <Text style={styles.issueType}>Issue: {t(item.issueType)}</Text>
                 {item.image && (
                   <Image source={{ uri: item.image }} style={styles.image} />
                 )}
                 <Text style={styles.description}>{item.description}</Text>
-                <Text style={styles.status}>
-                  Status: {item?.status ?? "Unknown"}
+                <Text
+                  style={[
+                    styles.statusPill,
+                    item.status.toLowerCase() === "pending" ||
+                    item.status.toLowerCase() === "solved"
+                      ? styles.redPill
+                      : item.status.toLowerCase() === "in progress"
+                      ? styles.greenPill
+                      : {},
+                  ]}
+                >
+                  {item.status}
                 </Text>
               </TouchableOpacity>
             )}
@@ -314,7 +326,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-    padding: 16,
+    padding: 10,
+    paddingTop: 10,
   },
   header: {
     fontSize: 22,
@@ -333,18 +346,39 @@ const styles = StyleSheet.create({
   selectedCard: {
     backgroundColor: "#b3c9ff",
   },
+  statusPill: {
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 12,
+    fontSize: 12,
+    fontWeight: "bold",
+    textAlign: "center",
+    color: "white",
+    overflow: "hidden",
+    marginTop: 4,
+  },
+  redPill: {
+    backgroundColor: "red",
+  },
+  greenPill: {
+    backgroundColor: "green",
+  },
+  status: {
+    fontWeight: "bold",
+  },
   issueType: {
     fontSize: 16,
     fontWeight: "bold",
   },
   description: {
-    fontSize: 14,
+    fontSize: 16,
     color: "#333",
-    textAlign: "center",
+    textAlign: "left",
+    marginTop: 5,
   },
   image: {
-    width: 50,
-    height: 50,
+    width: 60,
+    height: 70,
     marginTop: 5,
     borderRadius: 5,
     alignSelf: "center",
@@ -379,6 +413,7 @@ const styles = StyleSheet.create({
   chatHeader: {
     fontSize: 18,
     fontWeight: "bold",
+    paddingTop: 80,
   },
   messageText: {
     fontSize: 14,
@@ -396,11 +431,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#007AFF",
     padding: 10,
     marginTop: 10,
+    borderRadius: 20,
   },
   closeButton: {
     backgroundColor: "red",
     padding: 10,
     marginTop: 10,
+    borderRadius: 20,
   },
   submitButtonText: {
     color: "white",
@@ -413,18 +450,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   buttonContainer: {
-    flexDirection: "column", // Stack buttons vertically
-    alignItems: "center", // Center buttons
-    marginTop: 10, // Adjust spacing
+    flexDirection: "row",
+    alignSelf: "center",
+    marginTop: 10,
     gap: 8,
-    marginBottom: 40, // Adds space between buttons
+    marginBottom: 70,
   },
 
-  status: {
-    fontSize: 14,
-    color: "#333",
-    marginTop: 5,
-  },
   timestamp: {
     fontSize: 12,
     color: "#888",

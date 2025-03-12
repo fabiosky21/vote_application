@@ -22,6 +22,9 @@ import edit from "@/assets/icons/edit.png";
 import customer_service from "@/assets/icons/customer_service.png";
 import chat from "@/assets/icons/chat.png";
 import problemsolving from "@/assets/icons/problemsolving.png";
+import development from "@/assets/icons/development.png";
+import email from "@/assets/icons/email.png";
+
 export default {
   home,
   eye,
@@ -47,5 +50,7 @@ export default {
   customer_service,
   chat,
   problemsolving,
+  development,
+  email,
 
 };

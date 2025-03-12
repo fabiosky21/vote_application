@@ -54,7 +54,7 @@ export default function AdminLayout() {
         options={{
           title: "Create Polls",
           tabBarIcon: ({ focused }) => (
-            <TabBarIcon focused={focused} icon={icons.createpolls} title="Create Polls" />
+            <TabBarIcon focused={focused} icon={icons.development} title="Create Polls" />
           ),
         }}
       />
@@ -68,6 +68,15 @@ export default function AdminLayout() {
         }}
       />
       <Tabs.Screen
+        name="enquiries"  
+        options={{
+          title: "enquiry Admin",
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon focused={focused} icon={icons.email} title="Enquiries" />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="profilead"  
         options={{
           title: "Profile Admin",
@@ -76,15 +85,7 @@ export default function AdminLayout() {
           ),
         }}
       />
-       <Tabs.Screen
-        name="enquiries"  
-        options={{
-          title: "enquiry Admin",
-          tabBarIcon: ({ focused }) => (
-            <TabBarIcon focused={focused} icon={icons.problemsolving} title="Enquiries" />
-          ),
-        }}
-      />
+       
     </Tabs>
   );
 }

@@ -15,9 +15,9 @@ const resources = {
       settings: "Settings",
       help: "Help",
       activePolls:
-        "📌 Explore the latest active polls and have your say on important topics!.",
+        " Explore the latest active polls and have your say on important topics!.",
       newsInIreland:
-        "📰 Breaking news, trending topics, and important updates from across Ireland. Stay informed with the latest headlines!",
+        " Breaking news, trending topics, and important updates from across Ireland. Stay informed with the latest headlines!",
       voteRegisteredSuccess: "Vote registered successfully!",
       voteAlreadyCast: "You cannot vote twice in the same poll.",
       readMore: "Read More",
@@ -88,6 +88,7 @@ const resources = {
       contactUs: "Contact Us",
       mheader: "Messages",
       msheader: "This section shows all the conversations you have with the admin and moderators regards any issue with the application or general.",
+      Admin_Enquiries: "Admin Enquiry",
     },
   },
   es: {
@@ -98,9 +99,9 @@ const resources = {
       settings: "Configuraciones",
       help: "Ayuda",
       activePolls:
-        "📌 ¡Explora las últimas encuestas activas y da tu opinión sobre temas importantes!.",
+        " ¡Explora las últimas encuestas activas y da tu opinión sobre temas importantes!.",
       newsInIreland:
-        " 📰 Últimas noticias, temas de tendencia y actualizaciones importantes de toda Irlanda. ¡Mantente informado con los titulares más recientes!",
+        "  Últimas noticias, temas de tendencia y actualizaciones importantes de toda Irlanda. ¡Mantente informado con los titulares más recientes!",
       voteRegisteredSuccess: "¡Voto registrado con éxito!",
       voteAlreadyCast: "No puedes votar dos veces en la misma encuesta.",
       readMore: "Lee mas",
@@ -172,6 +173,7 @@ const resources = {
       mheader: "Mensajes",
       msheader: " Esta sección muestra todas las conversaciones que tienes con el administrador y los moderadores con respecto a cualquier problema con la aplicación o en general.",
     },
+    Admin_Enquiries: "Consultas de administrador",
   },
   fr: {
     translation: {
@@ -181,9 +183,9 @@ const resources = {
       settings: "Paramètres",
       help: "Aide",
       activePolls:
-        "📌 Explorez les derniers sondages actifs et donnez votre avis sur des sujets importants !.",
+        " Explorez les derniers sondages actifs et donnez votre avis sur des sujets importants !.",
       newsInIreland:
-        " 📰 Dernières nouvelles, sujets tendance et mises à jour importantes de toute l'Irlande. Restez informé avec les derniers titres !",
+        "  Dernières nouvelles, sujets tendance et mises à jour importantes de toute l'Irlande. Restez informé avec les derniers titres !",
       voteRegisteredSuccess: "Vote enregistré avec succès!",
       voteAlreadyCast:
         "Vous ne pouvez pas voter deux fois dans le même sondage.",
@@ -258,6 +260,7 @@ const resources = {
       contactUs: "Contactez-nous",
       mheader: "Messages",
       msheader: "Cette section montre toutes les conversations que vous avez avec l'administrateur et les modérateurs concernant tout problème avec l'application ou en général.",
+      Admin_Enquiries: "Demandes d'informations administratives",
     },
   },
 };
